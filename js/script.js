@@ -1,20 +1,45 @@
-// 1. create the global variables to select the elements
+// Create the global variables to select the elements
 const guessedLettersElement = document.querySelector(".guessed-letters");
 const guessLetterButton = document.querySelector(".guess");
 const letterInput = document.querySelector(".letter");
 const wordInProgress = document.querySelector(".word-in-progress");
 const remainingGuessesElement = document.querySelector(".remaining");
-const remainingGuessesSpan = document.querySelector(" remaining span");
+const remainingGuessesSpan = document.querySelector(".remaining span");
 const message = document.querySelector(".message");
 const playAgainButton = document.querySelector(".play-again");
 // Magnolia is the starting word to test out the game
-const word = "magnolia";
-// array for all the letters guessed
+let word = "magnolia";
+// Array for all the letters guessed
 const guessedLetters = [];
+// Set the number of guesses
+let remainingGuesses = 8;
 
+// Let's pull words to guess with an API
+const getWord = async function () {
+    // create a variable to hold the API response
+    // with fetch, apply the await keyword to wait for the function to resolve
+    const response = await fetch("https://gist.githubusercontent.com/skillcrush-curriculum/7061f1d4d3d5bfe47efbfbcfe42bf57e/raw/5ffc447694486e7dea686f34a6c085ae371b43fe/words.txt");
+    // apply the text method for fetching data from a text file
+    const words = await response.text();
+// transform the data fetched into an array
+// separate the elements by a line break
+    const wordArray = words.split("\n");
+    console.log(wordArray);
 
-// Display placeholders for the word's letters
-const addPlaceholders = function (word) {
+// Let's pull a random index
+    const randomIndex = Math.floor(Math.random() * wordArray.length);
+    console.log(randomIndex);
+    // Let's clean up any white space to avoid errors
+    word = wordArray[randomIndex].trim();
+
+    console.log(word);
+    // Let's call the function to display placeholders for our word
+    placeholder(word);
+};
+// Fire off the game
+getWord();
+// Let's display placeholders for the word's letters
+const placeholder = function (word) {
     // set empty array
     const placeholderLetters = [];
     // set loop
@@ -26,10 +51,10 @@ const addPlaceholders = function (word) {
     // update the text of the selected element with array elements joined into a string
     wordInProgress.innerText = placeholderLetters.join(""); 
 };
-addPlaceholders(word);
 
-// set button behavior
-// set user input variable
+
+// Let's set the button behavior
+// Let's set user input variable
 guessLetterButton.addEventListener("click", function (e) {
     // Don't want the default reload behavior
     e.preventDefault();
@@ -70,11 +95,13 @@ const makeGuess = function (guess) {
     guess = guess.toUpperCase();
 // We've got a duplicate/it's in the array
     if (guessedLetters.includes(guess)) {
-        message.innerText = "That letter's been guessed already."
+        message.innerText = "That letter's been guessed already. Try again."
     } else { // POPULATE THE gUESSEDLETTERS ARRAY
         guessedLetters.push(guess)
         console.log(guessedLetters);
         // Call the showGuessedLetter function here so that the letter displays only if it hasn't been guessed before
+        
+        updateGuessesRemaining(guess);
         showGuessedLetters();
         updateWordInProgress(guessedLetters);
     }
@@ -83,10 +110,10 @@ const makeGuess = function (guess) {
 // Let's display the guessed letters
 const showGuessedLetters = function () {
     guessedLettersElement.innerHTML = "";
-    for (let guessedLetter of guessedLetters) {
-        const listItem = document.createElement("li");
-        listItem.innerText = guessedLetter;
-        guessedLettersElement.append(listItem);
+    for (const letter of guessedLetters) {
+        const li = document.createElement("li");
+        li.innerText = letter;
+        guessedLettersElement.append(li);
     }
 };
 
@@ -101,22 +128,44 @@ const updateWordInProgress = function (guessedLetters) {
     // set the array of both correct guesses and placeholders
     const revealWord = [];
     // test each element of guessedLetters for a match of wordArray
-    for (const character of wordArray) {
-        if (guessedLetters.includes(character)) {
+    for (const letter of wordArray) {
+        if (guessedLetters.includes(letter)) {
             // if match, push the character 
-            revealWord.push(character.toUpperCase())
+            revealWord.push(letter.toUpperCase())
         } else { // if don't match, push placeholder
-                revealWord.push("●")
+            revealWord.push("●")
             }
     }
-    console.log(revealWord);
+    //console.log(revealWord);
     // update the text with the new array elements
     wordInProgress.innerText = revealWord.join("");
-    checkIfWonYet();
+    checkIfWin();
+};
+
+// Let's test the guess and count the remaining guesses
+const updateGuessesRemaining = function (guess) {
+// establish the case to avoid errors
+    const upperWord = word.toUpperCase();
+// if guess the letter wrong
+    if (!upperWord.includes(guess)) {
+        message.innerText = `Sorry, the word has no ${guess}.`;
+        remainingGuesses -= 1;
+        // if guess right
+    } else {
+        message.innerText = `Hooray! Good guess! The word has the letter ${guess}.`;
+    }
+// count down the remaining guesses
+    if (remainingGuesses === 0) {
+        message.innerHTML = `Game over! The word was <span class="highlight">${word}</span>.`;
+    } else if (remainingGuesses === 1) {
+        remainingGuessesSpan.innerText = `${remainingGuesses} guess`;
+    } else {
+        remainingGuessesSpan.innerText = `${remainingGuesses} guesses`;
+    }
 };
 
 // Let's check if we've won yet
-const checkIfWonYet = function () {
+const checkIfWin = function () {
     // test the word against the guesses
     if (word.toUpperCase() === wordInProgress.innerText) {
         // if they match, party!
@@ -124,5 +173,3 @@ const checkIfWonYet = function () {
         message.innerHTML = '<p class="highlight">You guessed correct the word! Congrats!</p>';
     }
 };
-
-
