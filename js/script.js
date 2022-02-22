@@ -1,11 +1,12 @@
 // Create the global variables to select the elements
-const guessedLettersElement = document.querySelector(".guessed-letters");
-const guessLetterButton = document.querySelector(".guess");
-const letterInput = document.querySelector(".letter");
+// In the order in the html
+const message = document.querySelector(".message");
 const wordInProgress = document.querySelector(".word-in-progress");
 const remainingGuessesElement = document.querySelector(".remaining");
 let remainingGuessesSpan = document.querySelector(".remaining span");
-const message = document.querySelector(".message");
+const guessedLettersElement = document.querySelector(".guessed-letters");
+const letterInput = document.querySelector(".letter");
+const guessLetterButton = document.querySelector(".guess");
 const playAgainButton = document.querySelector(".play-again");
 
 // Magnolia is the starting word to test out the game
@@ -25,15 +26,15 @@ const getWord = async function () {
 // transform the data fetched into an array
 // separate the elements by a line break
     const wordArray = words.split("\n");
-    console.log(wordArray);
+    // console.log(wordArray);
 
 // Let's pull a random index
     const randomIndex = Math.floor(Math.random() * wordArray.length);
-    console.log(randomIndex);
+    // console.log(randomIndex);
     // Let's clean up any white space to avoid errors
     word = wordArray[randomIndex].trim();
 
-    console.log(word);
+    // console.log(word);
     // Let's call the function to display placeholders for our word
     placeholder(word);
 };
@@ -45,7 +46,7 @@ const placeholder = function (word) {
     const placeholderLetters = [];
     // set loop
     for (const letter of word) {
-        console.log(letter);
+        // console.log(letter);
         // add element to the array
         placeholderLetters.push("●");
     }
@@ -99,7 +100,7 @@ const makeGuess = function (guess) {
         message.innerText = "That letter's been guessed already. Try again."
     } else { // POPULATE THE gUESSEDLETTERS ARRAY
         guessedLetters.push(guess)
-        console.log(guessedLetters);
+        // console.log(guessedLetters);
         // Call the showGuessedLetter function here so that the letter displays only if it hasn't been guessed before
         
         updateGuessesRemaining(guess);
